@@ -9,6 +9,7 @@ import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.Executors;
 import java.util.concurrent.ScheduledExecutorService;
 import java.util.concurrent.TimeUnit;
+import java.util.function.BiPredicate;
 
 public class ServiceCache {
 
@@ -42,6 +43,40 @@ public class ServiceCache {
     }
 
     /**
+     * 处理心跳请求并更新服务信息的Timestamp
+     * @param serviceId 服务ID
+     */
+    public static void processHeartbeat(String serviceId) {
+        // 根据serviceId找到对应的服务信息
+        ServiceInfo serviceInfo = findServiceInfoById(serviceId);
+
+        if (serviceInfo != null) {
+            // 更新服务信息的Timestamp为当前时间戳
+            serviceInfo.setTimestamp(System.currentTimeMillis());
+        }
+    }
+
+
+    /**
+     * 根据服务ID查找服务信息
+     * @param serviceId 服务ID
+     * @return 对应的服务信息对象，如果不存在则返回null
+     */
+    public static ServiceInfo findServiceInfoById(String serviceId) {
+        // 遍历缓存中的所有服务信息
+        for (List<ServiceInfo> serviceInfoList : cache.values()) {
+            for (ServiceInfo serviceInfo : serviceInfoList) {
+                // 如果找到与指定的serviceId匹配的服务信息，返回该服务信息对象
+                if (serviceInfo.getServiceId().equals(serviceId)) {
+                    return serviceInfo;
+                }
+            }
+        }
+        // 如果没有找到对应的服务信息，返回null
+        return null;
+    }
+
+    /**
      * 检查缓存中是否存在指定服务名称
      * @param serviceName 服务名称
      * @return 如果存在返回true，否则返回false
@@ -49,6 +84,31 @@ public class ServiceCache {
     public static boolean containsService(String serviceName) {
         return cache.containsKey(serviceName);
     }
+
+    /**
+     * 检查缓存中是否存在指定服务名称
+     * @param serviceName 服务名称
+     * @param serviceInfo 服务信息对象
+     * @return 如果存在返回true，否则返回false
+     */
+    public static boolean containsService(String serviceName, ServiceInfo serviceInfo) {
+        // 使用get方法获取指定服务名称对应的服务信息列表
+        List<ServiceInfo> serviceInfoList = cache.get(serviceName);
+
+        if (serviceInfoList != null) {
+            // 遍历服务信息列表，比较是否有匹配的ServiceInfo对象
+            for (ServiceInfo existingServiceInfo : serviceInfoList) {
+                if (existingServiceInfo.getServiceId().equals(serviceInfo.getServiceId()) &&
+                        existingServiceInfo.getIpAddress().equals(serviceInfo.getIpAddress()) &&
+                        existingServiceInfo.getPort().equals(serviceInfo.getPort())) {
+                    return true; // 如果有匹配的对象，返回true
+                }
+            }
+        }
+        // 如果没有找到匹配的ServiceInfo对象，返回false
+        return false;
+    }
+
 
     /**
      * 从缓存中移除指定的服务信息
