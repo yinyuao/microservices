@@ -5,6 +5,7 @@ import com.ksyun.start.camp.entity.ServiceInfo;
 import org.springframework.stereotype.Service;
 
 import java.util.ArrayList;
+import java.util.List;
 
 @Service
 public class RegisterService {
@@ -17,6 +18,19 @@ public class RegisterService {
      * @param serviceInfo 服务信息对象
      */
     public void register(ServiceInfo serviceInfo) {
+        ServiceInfo service = serviceCache.findServiceInfoById(serviceInfo.getServiceId());
+        if(service != null) {
+            return;
+        }
+        List<ServiceInfo> serviceInfoList = serviceCache.get(serviceInfo.getServiceName());
+        if(serviceInfoList != null) {
+            // 遍历服务信息列表，比较是否有匹配的ServiceInfo对象
+            for (ServiceInfo existingServiceInfo : serviceInfoList) {
+                if (existingServiceInfo.getIpAddress().equals(serviceInfo.getIpAddress())) {
+                    return;
+                }
+            }
+        }
         serviceCache.put(serviceInfo);
     }
 
