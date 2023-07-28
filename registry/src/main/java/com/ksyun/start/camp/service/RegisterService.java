@@ -26,7 +26,8 @@ public class RegisterService {
         if(serviceInfoList != null) {
             // 遍历服务信息列表，比较是否有匹配的ServiceInfo对象
             for (ServiceInfo existingServiceInfo : serviceInfoList) {
-                if (existingServiceInfo.getIpAddress().equals(serviceInfo.getIpAddress())) {
+                if (existingServiceInfo.getIpAddress().equals(serviceInfo.getIpAddress())
+                    && existingServiceInfo.getPort().equals(serviceInfo.getPort())) {
                     return;
                 }
             }
