@@ -11,5 +11,5 @@ public interface SimpleTimeService {
      * @param style 格式
      * @return 指定格式的时间字符串
      */
-    String getDateTime(String style);
+    Object getDateTime(String style);
 }

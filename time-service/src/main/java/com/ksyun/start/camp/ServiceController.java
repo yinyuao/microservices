@@ -1,13 +1,22 @@
 package com.ksyun.start.camp;
 
+import com.ksyun.start.camp.service.SimpleTimeService;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
 @RestController
 @RequestMapping("/api")
 public class ServiceController {
+    
+    @Autowired
+    private SimpleTimeService simpleTimeService;
 
     // 在此实现简单时间服务的接口逻辑
     // 1. 调用 SimpleTimeService
+    @RequestMapping("/getDateTime")
+    public Object getDateTime(String style) {
+        return simpleTimeService.getDateTime(style);
+    }
 
 }
