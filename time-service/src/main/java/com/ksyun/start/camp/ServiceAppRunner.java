@@ -24,7 +24,8 @@ public class ServiceAppRunner implements ApplicationRunner {
     @Value("${spring.application.name}")
     private String name;
 
-    private final String id = UUID.randomUUID().toString();
+    @Value("${spring.application.id}")
+    private String id;
 
     @Override
     public void run(ApplicationArguments args) throws Exception {

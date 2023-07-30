@@ -1,5 +1,8 @@
 package com.ksyun.start.camp.service;
 
+import com.ksyun.start.camp.entity.ResInfo;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Component;
 
 /**
@@ -8,15 +11,21 @@ import org.springframework.stereotype.Component;
 @Component
 public class ClientServiceImpl implements ClientService {
 
+    @Autowired
+    private TimeService timeService;
+
+    @Value("${spring.application.id}")
+    private String id;
 
     @Override
-    public String getInfo() {
-
-        // 开始编写你的逻辑，下面是提示
-        // 1. 调用 TimeService 获取远端服务返回的时间
-        // 2. 获取到自身的 serviceId 信息
-        // 3. 组合相关信息返回
-
-        return null;
+    public ResInfo getInfo() {
+        ResInfo resInfo = new ResInfo();
+        String time = timeService.getDateTime("full");
+        if(time == null) {
+            resInfo.setError("简单时间服务不可用!");
+            return resInfo;
+        }
+        resInfo.setResult("Hello Kingsoft Clound Star Camp - " + id + " - " + time);
+        return resInfo;
     }
 }

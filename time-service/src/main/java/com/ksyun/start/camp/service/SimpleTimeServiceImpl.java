@@ -1,22 +1,21 @@
 package com.ksyun.start.camp.service;
 
-import com.ksyun.start.camp.entity.ServiceInfo;
-import org.springframework.http.ResponseEntity;
+import com.ksyun.start.camp.entity.ResDataInfo;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Component;
-import org.springframework.web.client.RestTemplate;
 
 import java.time.Instant;
 import java.time.ZoneId;
-import java.time.ZoneOffset;
 import java.time.format.DateTimeFormatter;
-import java.util.HashMap;
-import java.util.Map;
 
 /**
  * 代表简单时间服务实现
  */
 @Component
 public class SimpleTimeServiceImpl implements SimpleTimeService {
+
+    @Value("${spring.application.id}")
+    private String id;
 
     @Override
     public Object getDateTime(String style) {
@@ -35,13 +34,9 @@ public class SimpleTimeServiceImpl implements SimpleTimeService {
                 dateTime = String.valueOf(Instant.now().toEpochMilli());
                 break;
         }
-        RestTemplate restTemplate = new RestTemplate();
-//        ServiceInfo serviceInfo = restTemplate.getForObject("http://127.0.0.1:8180/api/register?")
-        Map<String, String> map = new HashMap<>();
-        if (dateTime != null) {
-            map.put("result", dateTime);
-//            map.put("serviceId", );
-        }
-        return map;
+        ResDataInfo res = new ResDataInfo();
+        res.setResult(dateTime);
+        res.setServiceId(id);
+        return res;
     }
 }

@@ -1,15 +1,23 @@
 package com.ksyun.start.camp;
 
+import com.ksyun.start.camp.service.ClientService;
+import com.ksyun.start.camp.service.TimeService;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
 /**
  * 默认的客户端 API Controller
  */
 @RestController
+@RequestMapping("/api")
 public class ClientController {
 
-    // 在这里开始编写你的相关接口实现代码
-    // 返回值对象使用 ApiResponse 类
+    @Autowired
+    private ClientService clientService;
 
-    // 提示：调用 ClientService
+    @RequestMapping("/getInfo")
+    public ApiResponse getInfo() {
+        return ApiResponse.success(clientService.getInfo());
+    }
 }

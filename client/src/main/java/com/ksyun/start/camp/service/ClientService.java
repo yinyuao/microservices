@@ -1,5 +1,7 @@
 package com.ksyun.start.camp.service;
 
+import com.ksyun.start.camp.entity.ResInfo;
+
 public interface ClientService {
 
     /**
@@ -7,6 +9,6 @@ public interface ClientService {
      *
      * @return 相关信息
      */
-    String getInfo();
+    ResInfo getInfo();
 
 }

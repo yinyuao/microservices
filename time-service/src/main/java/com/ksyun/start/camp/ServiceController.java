@@ -15,8 +15,8 @@ public class ServiceController {
     // 在此实现简单时间服务的接口逻辑
     // 1. 调用 SimpleTimeService
     @RequestMapping("/getDateTime")
-    public Object getDateTime(String style) {
-        return simpleTimeService.getDateTime(style);
+    public ApiResponse getDateTime(String style) {
+        return ApiResponse.success(simpleTimeService.getDateTime(style));
     }
 
 }

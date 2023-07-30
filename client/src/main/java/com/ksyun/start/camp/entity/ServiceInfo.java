@@ -16,6 +16,4 @@ public class ServiceInfo {
 
     @JsonIgnore
     private long timestamp;
-
-
 }

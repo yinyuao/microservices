@@ -62,7 +62,7 @@ public class ServiceCache {
      * @param serviceId 服务ID
      * @return 对应的服务信息对象，如果不存在则返回null
      */
-    public static ServiceInfo findServiceInfoById(String serviceId) {
+    public static ServiceInfo findServiceInfoById(String serviceId){
         // 遍历缓存中的所有服务信息
         for (List<ServiceInfo> serviceInfoList : cache.values()) {
             for (ServiceInfo serviceInfo : serviceInfoList) {
@@ -72,7 +72,6 @@ public class ServiceCache {
                 }
             }
         }
-        // 如果没有找到对应的服务信息，返回null
         return null;
     }
 
