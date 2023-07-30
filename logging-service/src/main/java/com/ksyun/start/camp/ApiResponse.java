@@ -17,5 +17,28 @@ public class ApiResponse {
     private int code;
 
     // 提示：调整此处 data 类型
-    private String data;
+    private Object data;
+
+    public ApiResponse code(int code) {
+        this.code = code;
+        return this;
+    }
+
+    public ApiResponse data(Object data) {
+        this.data = data;
+        return this;
+    }
+
+    public static ApiResponse success(Object data) {
+        ApiResponse dto = new ApiResponse();
+        dto.code(200);
+        dto.data(data);
+        return dto;
+    }
+
+    public static ApiResponse failure() {
+        ApiResponse dto = new ApiResponse();
+        dto.code(500);
+        return dto;
+    }
 }
