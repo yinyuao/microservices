@@ -15,7 +15,7 @@ public class RegisterController {
     private RegisterService registerService;
 
     @RequestMapping("/register")
-    public void registry(@RequestBody ServiceInfo serviceInfo) throws Exception {
+    public void registry(@RequestBody ServiceInfo serviceInfo) {
         registerService.register(serviceInfo);
     }
 

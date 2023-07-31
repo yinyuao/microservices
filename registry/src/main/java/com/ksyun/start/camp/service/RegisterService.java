@@ -19,20 +19,10 @@ public class RegisterService {
      * 注册服务
      * @param serviceInfo 服务信息对象
      */
-    public void register(ServiceInfo serviceInfo) throws Exception {
+    public void register(ServiceInfo serviceInfo) {
         ServiceInfo service = serviceCache.findServiceInfoById(serviceInfo.getServiceId());
         if(service != null) {
-            throw new Exception("存在重复id");
-        }
-        List<ServiceInfo> serviceInfoList = serviceCache.get(serviceInfo.getServiceName());
-        if(serviceInfoList != null) {
-            // 遍历服务信息列表，比较是否有匹配的ServiceInfo对象
-            for (ServiceInfo existingServiceInfo : serviceInfoList) {
-                if (existingServiceInfo.getIpAddress().equals(serviceInfo.getIpAddress())
-                    && existingServiceInfo.getPort().equals(serviceInfo.getPort())) {
-                    return;
-                }
-            }
+            throw new RuntimeException("存在重复id");
         }
         serviceCache.put(serviceInfo);
     }
@@ -46,7 +36,7 @@ public class RegisterService {
         if (serviceCache.containsService(serviceInfo.getServiceName(), serviceInfo)) {
             serviceCache.remove(serviceInfo.getServiceName(), serviceInfo.getServiceId());
         } else {
-            System.out.println("false");
+            throw new RuntimeException("服务未注册！");
         }
     }
 
@@ -55,11 +45,10 @@ public class RegisterService {
      * @param serviceInfo 服务信息对象
      */
     public void heartbeat(ServiceInfo serviceInfo) {
-        try {
-            // 处理服务心跳，更新服务信息的时间戳
-            serviceCache.processHeartbeat(serviceInfo.getServiceId());
-        } catch (Exception e) {
-            e.printStackTrace();
+        // 处理服务心跳，更新服务信息的时间戳
+        ServiceInfo service = serviceCache.processHeartbeat(serviceInfo.getServiceId());
+        if(service == null) {
+            throw new RuntimeException("服务未注册！");
         }
     }
 

@@ -9,7 +9,6 @@ import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.Executors;
 import java.util.concurrent.ScheduledExecutorService;
 import java.util.concurrent.TimeUnit;
-import java.util.function.BiPredicate;
 
 public class ServiceCache {
 
@@ -44,9 +43,10 @@ public class ServiceCache {
 
     /**
      * 处理心跳请求并更新服务信息的Timestamp
+     *
      * @param serviceId 服务ID
      */
-    public static void processHeartbeat(String serviceId) {
+    public static ServiceInfo processHeartbeat(String serviceId) {
         // 根据serviceId找到对应的服务信息
         ServiceInfo serviceInfo = findServiceInfoById(serviceId);
 
@@ -54,6 +54,7 @@ public class ServiceCache {
             // 更新服务信息的Timestamp为当前时间戳
             serviceInfo.setTimestamp(System.currentTimeMillis());
         }
+        return serviceInfo;
     }
 
 
@@ -119,6 +120,9 @@ public class ServiceCache {
             v.removeIf(info -> info.getServiceId().equals(serviceId));
             return v;
         });
+        if(cache.get(serviceName).size() == 0) {
+            cache.remove(serviceName);
+        }
     }
 
     /**
