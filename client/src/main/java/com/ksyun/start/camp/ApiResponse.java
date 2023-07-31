@@ -39,9 +39,10 @@ public class ApiResponse {
         return dto;
     }
 
-    public static ApiResponse failure() {
+    public static ApiResponse failure(Object data) {
         ApiResponse dto = new ApiResponse();
         dto.code(500);
+        dto.data(data);
         return dto;
     }
 }

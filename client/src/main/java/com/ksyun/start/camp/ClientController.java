@@ -1,5 +1,6 @@
 package com.ksyun.start.camp;
 
+import com.ksyun.start.camp.entity.ResInfo;
 import com.ksyun.start.camp.service.ClientService;
 import com.ksyun.start.camp.service.TimeService;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -18,6 +19,11 @@ public class ClientController {
 
     @RequestMapping("/getInfo")
     public ApiResponse getInfo() {
-        return ApiResponse.success(clientService.getInfo());
+        ResInfo resInfo = clientService.getInfo();
+        if(resInfo.getError() == null) {
+            return ApiResponse.success(resInfo);
+        } else {
+            return ApiResponse.failure(resInfo);
+        }
     }
 }
