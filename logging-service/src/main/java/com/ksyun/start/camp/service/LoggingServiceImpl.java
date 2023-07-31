@@ -21,7 +21,6 @@ public class LoggingServiceImpl implements LoggingService {
 
     @Override
     public List<LogInfo> getList(String service) {
-        System.out.println(service);
         return logCache.getList(service);
     }
 }
