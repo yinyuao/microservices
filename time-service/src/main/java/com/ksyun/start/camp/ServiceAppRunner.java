@@ -10,10 +10,10 @@ import org.springframework.web.client.RestTemplate;
 
 import javax.annotation.PreDestroy;
 import java.util.UUID;
+import java.util.concurrent.Executors;
+import java.util.concurrent.ScheduledExecutorService;
+import java.util.concurrent.TimeUnit;
 
-/**
- * 服务启动运行逻辑
- */
 @Slf4j
 @Component
 public class ServiceAppRunner implements ApplicationRunner {
@@ -24,49 +24,64 @@ public class ServiceAppRunner implements ApplicationRunner {
     @Value("${spring.application.name}")
     private String name;
 
-    @Value("${spring.application.id}")
+    @Value("${spring.application.id:}")
     private String id;
+
+    private final RestTemplate restTemplate = new RestTemplate();
+
+    // 初始化定时任务，定期发送心跳
+    private final ScheduledExecutorService scheduler = Executors.newSingleThreadScheduledExecutor();
 
     @Override
     public void run(ApplicationArguments args) throws Exception {
-
-        // 此处代码会在 Boot 应用启动时执行
-        // 构建服务信息对象
-        ServiceInfo serviceInfo = new ServiceInfo();
-        serviceInfo.setServiceName(name);
-        serviceInfo.setIpAddress("127.0.0.1");
-        serviceInfo.setPort(port);
-        serviceInfo.setServiceId(id);
-        // 开始编写你的逻辑，下面是提示
-        RestTemplate restTemplate = new RestTemplate();
-        restTemplate.postForObject("http://127.0.0.1:8180/api/register", serviceInfo, String.class);
-        // 1. 向 registry 服务注册当前服务
-        // 2. 定期发送心跳逻辑
-        Thread heartbeatThread = new Thread(() -> {
-            while (true) {
-                try {
-                    // 模拟发送心跳
-                    restTemplate.postForObject("http://127.0.0.1:8180/api/heartbeat", serviceInfo, String.class);
-                    log.info(name+"服务发送心跳包成功！");
-                    // 休眠60秒
-                    Thread.sleep(20 * 1000);
-                } catch (InterruptedException e) {
-                    e.printStackTrace();
-                }
-            }
-        });
-        heartbeatThread.start();
+        // 注册服务
+        registerService();
+        // 定期发送心跳
+        startHeartbeat();
     }
 
     @PreDestroy
-    public void exit(){
+    public void exit() {
+        // 注销服务
+        unregisterService();
+        // 关闭定时任务
+        scheduler.shutdown();
+    }
+
+    // 注册当前服务
+    private void registerService() {
+        ServiceInfo serviceInfo = buildServiceInfo();
+        restTemplate.postForObject("http://127.0.0.1:8180/api/register", serviceInfo, String.class);
+        log.info("{}服务注册成功！", name);
+    }
+
+    // 注销当前服务
+    private void unregisterService() {
+        ServiceInfo serviceInfo = buildServiceInfo();
+        restTemplate.postForObject("http://127.0.0.1:8180/api/unregister", serviceInfo, String.class);
+        log.info("{}服务注销成功！", name);
+    }
+
+    // 构建服务信息对象
+    private ServiceInfo buildServiceInfo() {
         ServiceInfo serviceInfo = new ServiceInfo();
         serviceInfo.setServiceName(name);
         serviceInfo.setIpAddress("127.0.0.1");
         serviceInfo.setPort(port);
         serviceInfo.setServiceId(id);
-        RestTemplate restTemplate = new RestTemplate();
-        restTemplate.postForObject("http://127.0.0.1:8180/api/unregister", serviceInfo, String.class);
-        log.info(name+"服务删除成功！");
+        return serviceInfo;
+    }
+
+    // 开始定时发送心跳
+    private void startHeartbeat() {
+        scheduler.scheduleAtFixedRate(() -> {
+            try {
+                ServiceInfo serviceInfo = buildServiceInfo();
+                restTemplate.postForObject("http://127.0.0.1:8180/api/heartbeat", serviceInfo, String.class);
+                log.info("{}服务发送心跳包成功！", name);
+            } catch (Exception e) {
+                log.error("{}服务发送心跳包失败！", name, e);
+            }
+        }, 0, 56, TimeUnit.SECONDS); // 56秒为心跳发送间隔
     }
 }

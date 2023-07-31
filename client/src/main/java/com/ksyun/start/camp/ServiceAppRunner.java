@@ -1,5 +1,6 @@
 package com.ksyun.start.camp;
 
+import com.ksyun.start.camp.entity.LogInfo;
 import com.ksyun.start.camp.entity.ServiceInfo;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Value;
@@ -9,6 +10,11 @@ import org.springframework.stereotype.Component;
 import org.springframework.web.client.RestTemplate;
 
 import javax.annotation.PreDestroy;
+import java.text.SimpleDateFormat;
+import java.time.Instant;
+import java.time.ZoneId;
+import java.time.format.DateTimeFormatter;
+import java.util.Date;
 import java.util.UUID;
 
 /**
@@ -37,6 +43,11 @@ public class ServiceAppRunner implements ApplicationRunner {
         serviceInfo.setIpAddress("127.0.0.1");
         serviceInfo.setPort(port);
         serviceInfo.setServiceId(id);
+        LogInfo logInfo = new LogInfo();
+        logInfo.setServiceName(name);
+        logInfo.setServiceId(id);
+        logInfo.setLevel("level");
+        logInfo.setMessage("status is OK.");
         // 开始编写你的逻辑，下面是提示
         RestTemplate restTemplate = new RestTemplate();
         restTemplate.postForObject("http://127.0.0.1:8180/api/register", serviceInfo, String.class);
@@ -49,13 +60,28 @@ public class ServiceAppRunner implements ApplicationRunner {
                     restTemplate.postForObject("http://127.0.0.1:8180/api/heartbeat", serviceInfo, String.class);
                     log.info(name+"服务发送心跳包成功！");
                     // 休眠60秒
-                    Thread.sleep(20 * 1000);
+                    Thread.sleep(50 * 1000);
+                } catch (InterruptedException e) {
+                    e.printStackTrace();
+                }
+            }
+        });
+        Thread logThread = new Thread(() -> {
+            while (true) {
+                try {
+                    Date date = new Date(); // 获取当前时间
+                    SimpleDateFormat sdf = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss.SSS");
+                    logInfo.setDatetime(sdf.format(date));
+                    restTemplate.postForObject("http://127.0.0.1:8320/api/logging", logInfo, String.class);
+                    // 休眠60秒
+                    Thread.sleep(1000);
                 } catch (InterruptedException e) {
                     e.printStackTrace();
                 }
             }
         });
         heartbeatThread.start();
+        logThread.start();
     }
 
     @PreDestroy
