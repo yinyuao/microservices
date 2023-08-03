@@ -1,6 +1,8 @@
-package com.ksyun.start.camp.service;
+package com.ksyun.start.camp.service.impl;
 
 import com.ksyun.start.camp.entity.ResInfo;
+import com.ksyun.start.camp.service.ClientService;
+import com.ksyun.start.camp.service.TimeService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Component;
