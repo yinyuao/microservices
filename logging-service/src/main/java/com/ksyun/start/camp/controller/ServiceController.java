@@ -1,5 +1,6 @@
-package com.ksyun.start.camp;
+package com.ksyun.start.camp.controller;
 
+import com.ksyun.start.camp.entity.ApiResponse;
 import com.ksyun.start.camp.entity.LogInfo;
 import com.ksyun.start.camp.service.LoggingService;
 import org.springframework.beans.factory.annotation.Autowired;

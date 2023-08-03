@@ -1,7 +1,8 @@
-package com.ksyun.start.camp.service;
+package com.ksyun.start.camp.service.impl;
 
 import com.ksyun.start.camp.cache.LogCache;
 import com.ksyun.start.camp.entity.LogInfo;
+import com.ksyun.start.camp.service.LoggingService;
 import org.springframework.stereotype.Component;
 
 import java.util.List;
