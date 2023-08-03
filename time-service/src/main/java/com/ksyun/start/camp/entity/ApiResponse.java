@@ -1,4 +1,4 @@
-package com.ksyun.start.camp;
+package com.ksyun.start.camp.entity;
 
 import lombok.Data;
 import lombok.NoArgsConstructor;

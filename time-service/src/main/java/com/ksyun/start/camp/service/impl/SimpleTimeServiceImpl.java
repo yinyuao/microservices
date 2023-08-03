@@ -1,6 +1,7 @@
-package com.ksyun.start.camp.service;
+package com.ksyun.start.camp.service.impl;
 
 import com.ksyun.start.camp.entity.ResDataInfo;
+import com.ksyun.start.camp.service.SimpleTimeService;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Component;
 

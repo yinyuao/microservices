@@ -1,5 +1,6 @@
-package com.ksyun.start.camp;
+package com.ksyun.start.camp.controller;
 
+import com.ksyun.start.camp.entity.ApiResponse;
 import com.ksyun.start.camp.service.SimpleTimeService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.RequestMapping;
