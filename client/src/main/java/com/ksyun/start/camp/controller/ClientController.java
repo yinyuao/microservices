@@ -21,9 +21,9 @@ public class ClientController {
     public ApiResponse getInfo() {
         ResInfo resInfo = clientService.getInfo();
         if(resInfo.getError() == null) {
-            return ApiResponse.success(resInfo);
+            return ApiResponse.success().data(resInfo);
         } else {
-            return ApiResponse.failure(resInfo);
+            return ApiResponse.failure().data(resInfo);
         }
     }
 }

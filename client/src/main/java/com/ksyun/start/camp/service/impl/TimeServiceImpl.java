@@ -37,7 +37,7 @@ public class TimeServiceImpl implements TimeService {
         String services = restTemplate.getForObject("http://localhost:8180/api/discovery?name=time-service", String.class);
         List<ServiceInfo> service = jacksonMapper.fromJson(services, new TypeReference<List<ServiceInfo>>() {});
         if (service == null || service.isEmpty()) {
-            throw new RuntimeException("服务未注册！");
+            return null;
         }
 
         // Step 2: 调用远程服务
@@ -48,7 +48,7 @@ public class TimeServiceImpl implements TimeService {
 
         ApiResponse response = restTemplate.getForObject(builder.toUriString(), ApiResponse.class);
         if (response == null || response.getData() == null) {
-            throw new RuntimeException("获取时间失败！");
+            return null;
         }
         ResDataInfo timeDate = objectMapper.convertValue(response.getData(), ResDataInfo.class);
         String res = "";
