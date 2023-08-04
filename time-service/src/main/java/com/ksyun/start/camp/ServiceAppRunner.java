@@ -1,5 +1,6 @@
 package com.ksyun.start.camp;
 
+import com.ksyun.start.camp.entity.ApiResponse;
 import com.ksyun.start.camp.entity.ServiceInfo;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Value;
@@ -51,8 +52,12 @@ public class ServiceAppRunner implements ApplicationRunner {
     // 注册当前服务
     private void registerService() {
         ServiceInfo serviceInfo = buildServiceInfo();
-        restTemplate.postForObject("http://127.0.0.1:8180/api/register", serviceInfo, String.class);
-        log.info("{}服务注册成功！", name);
+        ApiResponse res = restTemplate.postForObject("http://127.0.0.1:8180/api/register", serviceInfo, ApiResponse.class);
+        if(res.getCode() == 200) {
+            log.info("{}服务注册成功！", name);
+        } else {
+            log.error("{}服务注册失败！", name);
+        }
     }
 
     // 注销当前服务
@@ -77,8 +82,12 @@ public class ServiceAppRunner implements ApplicationRunner {
         scheduler.scheduleAtFixedRate(() -> {
             try {
                 ServiceInfo serviceInfo = buildServiceInfo();
-                restTemplate.postForObject("http://127.0.0.1:8180/api/heartbeat", serviceInfo, String.class);
-                log.info("{}服务发送心跳包成功！", name);
+                ApiResponse res = restTemplate.postForObject("http://127.0.0.1:8180/api/heartbeat", serviceInfo, ApiResponse.class);
+                if(res.getCode() == 200) {
+                    log.info("{}服务发送心跳包成功！", name);
+                } else {
+                    registerService();
+                }
             } catch (Exception e) {
                 log.error("{}服务发送心跳包失败！", name, e);
             }
