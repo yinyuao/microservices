@@ -20,13 +20,16 @@ public class ServiceController {
 
     @RequestMapping("/logging")
     public ApiResponse logging(@RequestBody LogInfo logInfo) {
-        loggingService.logging(logInfo);
-        return ApiResponse.success("");
+        if (loggingService.logging(logInfo)) {
+            return ApiResponse.success();
+        } else {
+            return ApiResponse.failure().msg("Element duplicated!");
+        }
     }
 
     @RequestMapping("/list")
     public ApiResponse getList(String service) {
-        return ApiResponse.success(loggingService.getList(service));
+        return ApiResponse.success().data(loggingService.getList(service));
     }
 
 }

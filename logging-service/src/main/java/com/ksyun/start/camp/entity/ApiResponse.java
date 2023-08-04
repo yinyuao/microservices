@@ -8,7 +8,7 @@ import lombok.NoArgsConstructor;
  */
 @Data
 @NoArgsConstructor
-public class ApiResponse {
+public class ApiResponse<T> {
 
     /**
      * 代表此 API 的响应返回码
@@ -16,23 +16,29 @@ public class ApiResponse {
      */
     private int code;
 
+    private String msg;
+
     // 提示：调整此处 data 类型
-    private Object data;
+    private T data;
 
     public ApiResponse code(int code) {
         this.code = code;
         return this;
     }
 
-    public ApiResponse data(Object data) {
+    public ApiResponse msg(String msg) {
+        this.msg = msg;
+        return this;
+    }
+
+    public ApiResponse data(T data) {
         this.data = data;
         return this;
     }
 
-    public static ApiResponse success(Object data) {
+    public static ApiResponse success() {
         ApiResponse dto = new ApiResponse();
         dto.code(200);
-        dto.data(data);
         return dto;
     }
 
