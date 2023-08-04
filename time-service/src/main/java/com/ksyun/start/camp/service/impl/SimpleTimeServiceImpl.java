@@ -18,11 +18,6 @@ public class SimpleTimeServiceImpl implements SimpleTimeService {
     @Value("${spring.application.id}")
     private String id;
 
-    // 枚举表示不同的时间格式
-    private enum TimeStyle {
-        FULL, DATE, TIME, UNIX
-    }
-
     @Override
     public Object getDateTime(String style) {
         String dateTime = formatDateTime(style);
@@ -35,15 +30,14 @@ public class SimpleTimeServiceImpl implements SimpleTimeService {
 
     // 提取日期时间格式化逻辑为独立方法
     private String formatDateTime(String style) {
-        TimeStyle timeStyle = TimeStyle.valueOf(style.toUpperCase());
-        switch (timeStyle) {
-            case FULL:
+        switch (style) {
+            case "full":
                 return DateTimeFormatter.ofPattern("yyyy-MM-dd HH:mm:ss").format(Instant.now().atZone(ZoneId.of("GMT")));
-            case DATE:
+            case "date":
                 return DateTimeFormatter.ofPattern("yyyy-MM-dd").format(Instant.now().atZone(ZoneId.of("GMT")));
-            case TIME:
+            case "time":
                 return DateTimeFormatter.ofPattern("HH:mm:ss").format(Instant.now().atZone(ZoneId.of("GMT")));
-            case UNIX:
+            case "unix":
                 return String.valueOf(Instant.now().toEpochMilli());
             default:
                 return null;
