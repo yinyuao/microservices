@@ -132,7 +132,7 @@ public class ServiceAppRunner implements ApplicationRunner {
         LogInfo logInfo = new LogInfo();
         logInfo.setServiceName(name);
         logInfo.setServiceId(id);
-        logInfo.setLevel("level");
+        logInfo.setLevel("info");
         logInfo.setMessage("status is OK.");
         logInfo.setDatetime(formatDateTime(Instant.now()));
         return logInfo;
