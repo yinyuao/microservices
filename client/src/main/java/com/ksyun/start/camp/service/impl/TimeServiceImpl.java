@@ -1,18 +1,17 @@
 package com.ksyun.start.camp.service.impl;
 
-import com.fasterxml.jackson.annotation.JsonInclude;
 import com.fasterxml.jackson.core.type.TypeReference;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.ksyun.start.camp.entity.ApiResponse;
 import com.ksyun.start.camp.entity.ResDataInfo;
 import com.ksyun.start.camp.entity.ServiceInfo;
 import com.ksyun.start.camp.service.TimeService;
-import com.ksyun.start.camp.utils.JacksonMapper;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 import org.springframework.web.client.RestTemplate;
 import org.springframework.web.util.UriComponentsBuilder;
 
+import javax.annotation.Resource;
 import java.text.ParseException;
 import java.text.SimpleDateFormat;
 import java.util.Date;
@@ -25,39 +24,49 @@ import java.util.TimeZone;
 @Component
 public class TimeServiceImpl implements TimeService {
 
-    private static final JacksonMapper jacksonMapper = new JacksonMapper(JsonInclude.Include.NON_NULL);
-
     @Autowired
     private ObjectMapper objectMapper;
 
     @Override
     public String getDateTime(String style) {
         // Step 1: 获取远程服务列表
-        RestTemplate restTemplate = new RestTemplate();
-        String services = restTemplate.getForObject("http://localhost:8180/api/discovery?name=time-service", String.class);
-        List<ServiceInfo> service = jacksonMapper.fromJson(services, new TypeReference<List<ServiceInfo>>() {});
+        List<ServiceInfo> service = getRemoteServices("time-service");
         if (service == null || service.isEmpty()) {
             return null;
         }
 
         // Step 2: 调用远程服务
         ServiceInfo selectedService = service.get(0); // 这里可以根据负载均衡策略选择合适的服务实例
-        String uri = String.format("http://%s:%d/api/getDateTime", selectedService.getIpAddress(), selectedService.getPort());
-        UriComponentsBuilder builder = UriComponentsBuilder.fromUriString(uri)
-                .queryParam("style", style);
-
-        ApiResponse response = restTemplate.getForObject(builder.toUriString(), ApiResponse.class);
+        String uri = buildServiceUri(selectedService, style);
+        RestTemplate restTemplate = new RestTemplate();
+        ApiResponse response = restTemplate.getForObject(uri, ApiResponse.class);
         if (response == null || response.getData() == null) {
             return null;
         }
+
         ResDataInfo timeDate = objectMapper.convertValue(response.getData(), ResDataInfo.class);
         String res = "";
         try {
             res = convertGMTToBeijingTime(timeDate.getResult());
         } catch (ParseException e) {
-            e.printStackTrace();
+            return null;
         }
         return res;
+    }
+
+    // 获取远程服务列表
+    private List<ServiceInfo> getRemoteServices(String serviceName) {
+        RestTemplate restTemplate = new RestTemplate();
+        ApiResponse result = restTemplate.getForObject("http://localhost:8180/api/discovery?name=" + serviceName, ApiResponse.class);
+        return objectMapper.convertValue(result.getData(), new TypeReference<List<ServiceInfo>>() {});
+    }
+
+    // 构建远程服务调用的URI
+    private String buildServiceUri(ServiceInfo serviceInfo, String style) {
+        String uri = String.format("http://%s:%d/api/getDateTime", serviceInfo.getIpAddress(), serviceInfo.getPort());
+        return UriComponentsBuilder.fromUriString(uri)
+                .queryParam("style", style)
+                .toUriString();
     }
 
     // 将GMT时间字符串转换为北京时间字符串
@@ -70,8 +79,19 @@ public class TimeServiceImpl implements TimeService {
         SimpleDateFormat beijingFormatter = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss");
         beijingFormatter.setTimeZone(TimeZone.getTimeZone("Asia/Shanghai"));
 
-        Date gmtTime = gmtFormatter.parse(gmtTimeStr);
-        String beijingTimeStr = beijingFormatter.format(gmtTime);
+        Date gmtTime;
+        try {
+            gmtTime = gmtFormatter.parse(gmtTimeStr);
+        } catch (ParseException e) {
+            throw new ParseException("Unable to parse GMT time", e.getErrorOffset());
+        }
+
+        String beijingTimeStr;
+        try {
+            beijingTimeStr = beijingFormatter.format(gmtTime);
+        } catch (Exception e) {
+            throw new ParseException("Unable to format Beijing time", 0);
+        }
 
         return beijingTimeStr;
     }
