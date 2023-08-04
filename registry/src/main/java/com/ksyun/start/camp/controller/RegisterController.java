@@ -1,6 +1,7 @@
 package com.ksyun.start.camp.controller;
 
 import com.ksyun.start.camp.entity.ServiceInfo;
+import com.ksyun.start.camp.rest.ApiResponse;
 import com.ksyun.start.camp.service.RegisterService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.RequestBody;
@@ -15,22 +16,35 @@ public class RegisterController {
     private RegisterService registerService;
 
     @RequestMapping("/register")
-    public void registry(@RequestBody ServiceInfo serviceInfo) {
-        registerService.register(serviceInfo);
+    public ApiResponse registry(@RequestBody ServiceInfo serviceInfo) {
+        if(registerService.register(serviceInfo)) {
+            return ApiResponse.success().msg("Service registered successfully.");
+        } else {
+            return ApiResponse.failure().msg("Service with the same id combination already registered.");
+        }
     }
 
     @RequestMapping("/unregister")
-    public void unregister(@RequestBody ServiceInfo serviceInfo) {
-        registerService.unregister(serviceInfo);
+    public ApiResponse unregister(@RequestBody ServiceInfo serviceInfo) {
+        if(registerService.unregister(serviceInfo)) {
+            return ApiResponse.success().msg("Service unregistered successfully.");
+        } else {
+            return ApiResponse.failure().msg("Service with the specified ID not found for unregistration.");
+        }
+
     }
 
     @RequestMapping("/heartbeat")
-    public void heartbeat(@RequestBody ServiceInfo serviceInfo) {
-        registerService.heartbeat(serviceInfo);
+    public ApiResponse heartbeat(@RequestBody ServiceInfo serviceInfo) {
+        if(registerService.heartbeat(serviceInfo)) {
+            return ApiResponse.success().msg("Heartbeat received and service status updated.");
+        } else {
+            return ApiResponse.failure().msg("Error occurred while processing heartbeat.");
+        }
     }
 
     @RequestMapping("/discovery")
-    public Object discovery(String name) {
-        return registerService.discovery(name);
+    public ApiResponse discovery(String name) {
+        return ApiResponse.success().data(registerService.discovery(name)).msg("Service discovered successfully.");
     }
 }

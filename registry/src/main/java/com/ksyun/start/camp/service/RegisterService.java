@@ -11,11 +11,11 @@ import java.util.List;
 public interface RegisterService {
 
 
-    void register(ServiceInfo serviceInfo);
+    boolean register(ServiceInfo serviceInfo);
 
-    void unregister(ServiceInfo serviceInfo);
+    boolean unregister(ServiceInfo serviceInfo);
 
-    void heartbeat(ServiceInfo serviceInfo);
+    boolean heartbeat(ServiceInfo serviceInfo);
 
     Object discovery(String name);
 }

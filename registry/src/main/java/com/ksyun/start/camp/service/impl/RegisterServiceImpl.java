@@ -20,24 +20,26 @@ public class RegisterServiceImpl implements RegisterService {
      * 注册服务
      * @param serviceInfo 服务信息对象
      */
-    public void register(ServiceInfo serviceInfo) {
+    public boolean register(ServiceInfo serviceInfo) {
         ServiceInfo service = serviceCache.findServiceInfoById(serviceInfo.getServiceId());
         if(service != null) {
-            throw new RuntimeException("存在重复id");
+            return false;
         }
         serviceCache.put(serviceInfo);
+        return true;
     }
 
     /**
      * 注销服务
      * @param serviceInfo 服务信息对象
      */
-    public void unregister(ServiceInfo serviceInfo) {
+    public boolean unregister(ServiceInfo serviceInfo) {
         // 判断服务是否已注册，如果已注册则进行注销，否则打印提示信息
         if (serviceCache.containsService(serviceInfo.getServiceName(), serviceInfo)) {
             serviceCache.remove(serviceInfo.getServiceName(), serviceInfo.getServiceId());
+            return true;
         } else {
-            throw new RuntimeException("服务未注册！");
+            return false;
         }
     }
 
@@ -45,12 +47,13 @@ public class RegisterServiceImpl implements RegisterService {
      * 处理服务心跳
      * @param serviceInfo 服务信息对象
      */
-    public void heartbeat(ServiceInfo serviceInfo) {
+    public boolean heartbeat(ServiceInfo serviceInfo) {
         // 处理服务心跳，更新服务信息的时间戳
         ServiceInfo service = serviceCache.processHeartbeat(serviceInfo.getServiceId());
         if(service == null) {
-            throw new RuntimeException("服务未注册！");
+            return false;
         }
+        return true;
     }
 
     /**
