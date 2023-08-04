@@ -4,7 +4,7 @@ import lombok.Data;
 
 @Data
 public class LogInfo {
-    private long logId;
+    private Long logId;
     private String serviceName;
     private String serviceId;
     private String datetime;

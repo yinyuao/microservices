@@ -16,8 +16,13 @@ public class LoggingServiceImpl implements LoggingService {
     private LogCache logCache = new LogCache();
 
     @Override
-    public void logging(LogInfo logInfo) {
+    public boolean logging(LogInfo logInfo) {
+        // 如果存在重复就不执行
+        if(logCache.hasDuplicates(logInfo)) {
+            return false;
+        }
         logCache.put(logInfo);
+        return true;
     }
 
     @Override

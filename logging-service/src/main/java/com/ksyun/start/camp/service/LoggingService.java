@@ -8,7 +8,7 @@ import java.util.List;
  * 日志服务实现接口
  */
 public interface LoggingService {
-    void logging(LogInfo logInfo);
+    boolean logging(LogInfo logInfo);
 
     List<LogInfo> getList(String service);
 
