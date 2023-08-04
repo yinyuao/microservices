@@ -17,7 +17,11 @@ public class ServiceController {
     // 1. 调用 SimpleTimeService
     @RequestMapping("/getDateTime")
     public ApiResponse getDateTime(String style) {
-        return ApiResponse.success(simpleTimeService.getDateTime(style));
+        Object dataTime = simpleTimeService.getDateTime(style);
+        if(dataTime == null) {
+            return ApiResponse.failure();
+        }
+        return ApiResponse.success().data(dataTime);
     }
 
 }

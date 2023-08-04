@@ -26,6 +26,9 @@ public class SimpleTimeServiceImpl implements SimpleTimeService {
     @Override
     public Object getDateTime(String style) {
         String dateTime = formatDateTime(style);
+        if(dateTime == null) {
+            return null;
+        }
         ResDataInfo res = createResDataInfo(dateTime);
         return res;
     }
@@ -43,7 +46,7 @@ public class SimpleTimeServiceImpl implements SimpleTimeService {
             case UNIX:
                 return String.valueOf(Instant.now().toEpochMilli());
             default:
-                throw new IllegalArgumentException("Invalid time style: " + style);
+                return null;
         }
     }
 
